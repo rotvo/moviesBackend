@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import axios from 'axios';
 import Bottleneck from 'bottleneck';
-import mysql from 'mysql2/promise';
+import { Pool } from 'pg';
 import { RowDataPacket } from 'mysql2/promise';
 const cors = require('cors');
 import NodeCache from 'node-cache';
@@ -15,14 +15,16 @@ const port = 3000;
 
 const dbConfig = {
   host: process.env.DB_HOST,
-  port: 14900,
+  port: Number(process.env.DB_PORT),
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  
 };
 
 const cache = new NodeCache({ stdTTL: 600, checkperiod: 120 }); // TTL of 10 minuts, it will check every 2 minutes
-const pool = mysql.createPool(dbConfig);
+
+const pool = new Pool(dbConfig);
 
 const corsOptions = {
   origin: '*',
@@ -149,12 +151,11 @@ app.post('/api/movies/rateMovie', limiter.wrap(async (req: Request, res: Respons
   }
 
   try {
-    const [result] = await pool.execute(
-      `INSERT INTO MovieRating (movie_id, user_rating, review) VALUES (?, ?, ?)`,
+    const result = await pool.query(
+      `INSERT INTO MovieRating (movie_id, user_rating, review) VALUES ($1, $2, $3) RETURNING movie_id`,
       [movieId, userRating, review]
     );
-
-    res.status(201).json({ message: 'Review added successfully', reviewId: (result as RowDataPacket).insertId });
+    res.status(201).json({ message: 'Review added successfully', reviewId: result.rows[0].movie_id });
   } catch (error) {
     console.error('Error saving review:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -166,16 +167,16 @@ app.get('/api/movies/:movieId/reviews', limiter.wrap(async (req: Request, res: R
 
   try {
 
-    const [reviews] = await pool.execute<RowDataPacket[]>(
-      `SELECT user_rating, review, created_at FROM MovieRating WHERE movie_id = ?`,
+    const reviews = await pool.query(
+      `SELECT user_rating, review, created_at FROM MovieRating WHERE movie_id = $1`,
       [movieId]
     );
 
-    if (reviews.length === 0) {
+    if (reviews.rows.length === 0) {
       return res.status(404).json({ message: 'No reviews found for this movie' });
     }
 
-    res.status(200).json(reviews);
+    res.status(200).json(reviews.rows);
   } catch (error) {
     console.error('Error retrieving reviews:', error);
     res.status(500).json({ error: 'Internal server error' });
