@@ -1,8 +1,6 @@
-import { Auth } from "./auth.interface";
-
-export interface User extends Auth {
-    name? : string;
-    phone? : string;
-    description?: string;
-    address?: string;
+export interface User {
+    id: number;
+    email: string;
+    password_hash: string;
+    created_at: Date;
 }

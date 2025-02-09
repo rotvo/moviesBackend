@@ -4,10 +4,10 @@ import { sequelize } from '../config/postgres';
 interface ProductAttributes {
   id?: number;
   name: string;
-  active: boolean;
+  active?: boolean;
   sell_price: number;
-  profit_margin: number;
-  created_atttt?: Date;
+  profit_margin?: number;
+  created_at?: Date;
 }
 
 class Product extends Model<ProductAttributes> implements ProductAttributes {
@@ -40,7 +40,7 @@ Product.init(
     },
     profit_margin: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
+      allowNull: true,
     },
   },
   {

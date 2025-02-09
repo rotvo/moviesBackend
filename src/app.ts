@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 const port = 3000;
 app.use(express.json());
-app.use(router);
+
 
 
 
@@ -26,7 +26,7 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
-
+app.use(router);
 
 const limiter = new Bottleneck({
   maxConcurrent: 5,  // max concurrent requests

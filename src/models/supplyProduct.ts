@@ -1,7 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/postgres';
 import Supply from './supply';
-import Product from './product';
+import Product from './Product';
 
 interface SupplyProductAttributes {
   id?: number;

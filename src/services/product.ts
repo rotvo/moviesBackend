@@ -1,6 +1,6 @@
-import Product from '../models/product';
+import Product from '../models/Product';
 
-const insertProduct = async (product: any) => {
+const insertProduct = async (product: Product) => {
   try {
     const createdProduct = await Product.create(product);
     return createdProduct;

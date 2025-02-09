@@ -2,7 +2,7 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/postgres';
 import Sale from './Sale';
-import Product from './product';
+import Product from './Product';
 
 interface SaleDetailAttributes {
   id?: number;

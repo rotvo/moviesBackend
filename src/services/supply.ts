@@ -1,6 +1,6 @@
-import Supply from '../models/supply';
+import Supply from '../models/Supply';
 
-const insertSupply = async (supply: any) => {
+const insertSupply = async (supply: Supply) => {
   try {
     const createdSupply = await Supply.create(supply);
     return createdSupply;
